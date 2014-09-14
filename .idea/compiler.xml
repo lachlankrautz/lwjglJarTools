@@ -27,6 +27,9 @@
         <module name="natives" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="lwjglnatives" target="1.6" />
+    </bytecodeTargetLevel>
   </component>
 </project>
 
