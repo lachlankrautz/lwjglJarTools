@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>co.notime</groupId>
-	<artifactId>natives</artifactId>
+	<artifactId>lwjgl-natives</artifactId>
 	<version>1.0-SNAPSHOT</version>
 
 	<properties>
