@@ -3,7 +3,9 @@ package co.notime.lwjglnatives;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 /**
  * User: lachlan.krautz
@@ -14,25 +16,40 @@ public class NativesHandler {
 
     private static Logger logger = LogManager.getLogger(NativesHandler.class.getName());
 
+    private ArrayList<String> possiblePaths;
     private File cacheDir;
     private File projectDir;
 
     public NativesHandler () {
-        cacheDir   = findCacheDir();
-        projectDir = new File("").getAbsoluteFile();
+        possiblePaths = new ArrayList<String>();
+        cacheDir      = findCacheDir();
+        projectDir    = new File("").getAbsoluteFile();
         logger.info("Cache dir: "   + cacheDir);
         logger.info("Project dir: " + projectDir);
     }
 
-    public void openNatives () {
+    public boolean canCacheNatives () {
+        return cacheDir != null;
+    }
+
+    public void cacheNatives () throws IOException {
         logger.info("opening natives");
+        if (cacheDir == null) {
+            throw new IOException("Cache dir not found");
+        }
+        if (possiblePaths.size() == 0) {
+            logger.info("No possible paths set; where should I look?");
+        } else {
+            for (String s : possiblePaths) {
+
+            }
+        }
         // fixLibraryPath();
     }
 
-    public void closeNatives () {
+    public void cleanupNatives () {
         logger.info("closing natives");
     }
-
 
     private void fixLibraryPath () {
         System.setProperty( "java.library.path", "natives" );
@@ -49,11 +66,20 @@ public class NativesHandler {
     }
 
     private File findCacheDir () {
+        File cacheDir = null;
+        String cacheDirPath = findCacheDirPath();
+        if (cacheDirPath != null) {
+            cacheDir = new File(cacheDirPath);
+        }
+        return cacheDir;
+    }
+
+    private String findCacheDirPath () {
         String cacheDirPath = System.getProperty("deployment.user.cachedir");
         if ((cacheDirPath == null) || (System.getProperty("os.name").startsWith("Win"))) {
             cacheDirPath = System.getProperty("java.io.tmpdir");
         }
-        return new File(cacheDirPath);
+        return cacheDirPath;
     }
 
     public String toString () {
