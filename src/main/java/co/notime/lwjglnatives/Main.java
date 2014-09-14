@@ -1,7 +1,7 @@
-package co.notime.natives;
+package co.notime.lwjglnatives;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * User: lachlan.krautz
@@ -10,11 +10,9 @@ import org.apache.log4j.Logger;
  */
 public class Main {
 
-    static Logger logger = Logger.getLogger(Main.class);
+    private static Logger logger = LogManager.getLogger(Main.class.getName());
 
     public static void main (String[] args) {
-        BasicConfigurator.configure();
-
         logger.info("Entering application");
         NativesHandler n = new NativesHandler();
         logger.info("Exiting application");

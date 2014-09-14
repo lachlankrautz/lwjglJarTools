@@ -1,6 +1,7 @@
-package co.notime.natives;
+package co.notime.lwjglnatives;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.lang.reflect.Field;
 
@@ -11,7 +12,7 @@ import java.lang.reflect.Field;
  */
 public class NativesHandler {
 
-    private static Logger logger = Logger.getLogger(NativesHandler.class);
+    private static Logger logger = LogManager.getLogger(NativesHandler.class.getName());
 
     private File cacheDir;
     private File projectDir;

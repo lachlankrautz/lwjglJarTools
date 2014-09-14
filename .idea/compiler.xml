@@ -23,6 +23,7 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="lwjgl-natives" />
+        <module name="lwjglnatives" />
         <module name="natives" />
       </profile>
     </annotationProcessing>
