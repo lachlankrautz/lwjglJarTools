@@ -3,16 +3,11 @@ package co.notime.lwjglnatives;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 /**
  * User: lachlan.krautz
@@ -22,23 +17,32 @@ import java.util.List;
 public class NativesList {
 
     private static Logger logger = LogManager.getLogger(NativesList.class.getName());
+    private Map nativesMap;
 
-    public NativesList () throws IOException {
-        File f = new File(".");
-        String[] sl = f.list();
-        if (sl != null) {
-            for (String s : sl) {
-                logger.info(s);
+    public NativesList () {
+        InputStream is = NativesList.class.getResourceAsStream("/nativesList.json");
+        if (is != null) {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            byte[] buffer = new byte[16384];
+            int i;
+            try {
+                while ((i = is.read(buffer, 0, buffer.length)) != -1) {
+                    os.write(buffer, 0, i);
+                }
+                os.flush();
+                byte[] jsonData = os.toByteArray();
+                ObjectMapper objectMapper = new ObjectMapper();
+                nativesMap = objectMapper.readValue(jsonData, HashMap.class);
+            } catch (IOException e) {
+                logger.error("failed to parse json", e);
             }
         } else {
-            logger.error("empty list");
+            logger.error("unable to find json file");
         }
-        /*
-        byte[] mapData = Files.readAllBytes(Paths.get("nativesList.json"));
-        ObjectMapper objectMapper = new ObjectMapper();
-        HashMap myMap = objectMapper.readValue(mapData, HashMap.class);
-        logger.info("Map is: " + myMap);
-        */
+    }
+
+    public Map getNativesMap () {
+        return nativesMap;
     }
 
 }
