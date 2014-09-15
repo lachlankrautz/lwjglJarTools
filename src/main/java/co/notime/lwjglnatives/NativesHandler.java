@@ -16,17 +16,17 @@ public class NativesHandler {
 
     private static Logger logger = LogManager.getLogger(NativesHandler.class.getName());
 
-    private ArrayList<String> possiblePaths;
+    private String relativePath;
     private File cacheDir;
     private File projectDir;
 
     public NativesHandler () {
-        possiblePaths = new ArrayList<String>();
         cacheDir      = findCacheDir();
         projectDir    = new File("").getAbsoluteFile();
         logger.info("Cache dir: "   + cacheDir);
         logger.info("Project dir: " + projectDir);
     }
+
 
     public boolean canCacheNatives () {
         return cacheDir != null;
@@ -37,13 +37,8 @@ public class NativesHandler {
         if (cacheDir == null) {
             throw new IOException("Cache dir not found");
         }
-        if (possiblePaths.size() == 0) {
-            logger.info("No possible paths set; where should I look?");
-        } else {
-            for (String s : possiblePaths) {
+        NativesList nl = new NativesList();
 
-            }
-        }
         // fixLibraryPath();
     }
 
