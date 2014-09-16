@@ -1,11 +1,13 @@
 package co.notime.lwjglnatives;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * User: lachlan.krautz
@@ -15,6 +17,9 @@ import java.util.ArrayList;
 public class NativesHandler {
 
     private static Logger logger = LogManager.getLogger(NativesHandler.class.getName());
+    private static final String WINDOWS = "windows";
+    private static final String LINUX   = "linux";
+    private static final String OSX     = "osx";
 
     private String relativePath;
     private File cacheDir;
@@ -38,8 +43,18 @@ public class NativesHandler {
             throw new IOException("Cache dir not found");
         }
         NativesList nl = new NativesList();
+        JsonNode nativesMap = nl.getNativesMap();
+        JsonNode w = nativesMap.get("windows");
+        logger.info(w);
+        for (JsonNode n: w) {
+            logger.info("n: " + n);
+        }
 
         // fixLibraryPath();
+    }
+
+    private String getSystemKey () {
+
     }
 
     public void cleanupNatives () {

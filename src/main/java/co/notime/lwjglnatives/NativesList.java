@@ -1,13 +1,11 @@
 package co.notime.lwjglnatives;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * User: lachlan.krautz
@@ -17,22 +15,14 @@ import java.util.Map;
 public class NativesList {
 
     private static Logger logger = LogManager.getLogger(NativesList.class.getName());
-    private Map nativesMap;
+    private JsonNode nativesMap;
 
     public NativesList () {
         InputStream is = NativesList.class.getResourceAsStream("/nativesList.json");
         if (is != null) {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            byte[] buffer = new byte[16384];
-            int i;
             try {
-                while ((i = is.read(buffer, 0, buffer.length)) != -1) {
-                    os.write(buffer, 0, i);
-                }
-                os.flush();
-                byte[] jsonData = os.toByteArray();
                 ObjectMapper objectMapper = new ObjectMapper();
-                nativesMap = objectMapper.readValue(jsonData, HashMap.class);
+                nativesMap = objectMapper.readValue(is, JsonNode.class);
             } catch (IOException e) {
                 logger.error("failed to parse json", e);
             }
@@ -41,7 +31,7 @@ public class NativesList {
         }
     }
 
-    public Map getNativesMap () {
+    public JsonNode getNativesMap () {
         return nativesMap;
     }
 
