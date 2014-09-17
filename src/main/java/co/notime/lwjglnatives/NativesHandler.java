@@ -1,20 +1,19 @@
 package co.notime.lwjglnatives;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
+import java.util.Random;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.regex.Pattern;
 
 /**
  * User: lachlan.krautz
@@ -28,13 +27,14 @@ public class NativesHandler {
     private static final String LINUX   = "linux";
     private static final String OSX     = "osx";
 
-    private String relativePath;
-    private String systemKey;
-    private File cacheDir;
-    private File projectDir;
+    private JarFile      jarFile;
+    private List<String> natives;
+    private File         cacheDir;
+    private File         projectDir;
 
     public NativesHandler () {
-        systemKey     = getSystemKey();
+        jarFile       = getRunningJar();
+        natives       = findSystemNatives(jarFile);
         cacheDir      = findCacheDir();
         projectDir    = new File("").getAbsoluteFile();
         logger.info("Cache dir: "   + cacheDir);
@@ -51,50 +51,65 @@ public class NativesHandler {
      * @return Can or cannot find & cache
      */
     public boolean canCacheNatives () {
-        return cacheDir != null && systemKey != null && inJar();
+        return cacheDir != null && canDetermineSystem() && inJar();
     }
 
     public void cacheNatives () throws Exception {
         logger.info("opening natives");
         checkCapable();
-        List<String> natives = findSystemNatives();
+        createDir(cacheDir);
         for (String s : natives) {
-            logger.info("native found: " + s);
+            cacheNative(s);
         }
-
-
-        // fixLibraryPath();
+        fixLibraryPath();
     }
 
-    /*
-    private void findSystemNatives () {
-        NativesList nl = new NativesList();
-        JsonNode nativesMap = nl.getNativesMap();
-        JsonNode w = nativesMap.get("windows");
-        logger.info(w);
-        for (JsonNode n: w) {
-            logger.info("n: " + n);
+    public void cleanupNatives () {
+        logger.info("closing natives");
+        deleteDir(cacheDir);
+    }
+
+    private void createDir (File dir) {
+        if (!dir.exists() && !dir.mkdirs()) {
+            System.out.println("Unable to make missing dir");
         }
     }
-    */
 
-    public List<String> findSystemNatives () throws Exception {
+    private void cacheNative (String nativeName) throws Exception {
+        logger.info("caching native: " + nativeName);
+        InputStream in = jarFile.getInputStream(jarFile.getEntry(nativeName));
+        OutputStream out = new FileOutputStream(cacheDir + File.separator + nativeName);
+        byte[] buffer = new byte[65536];
+        int bufferSize;
+        while ((bufferSize = in.read(buffer, 0, buffer.length)) != -1) {
+            out.write(buffer, 0, bufferSize);
+        }
+        in.close();
+        out.close();
+    }
+
+    private List<String> findSystemNatives (JarFile jarFile) {
         List<String> natives = new ArrayList<String>();
-        JarFile jarFile = getRunningJar();
-        Enumeration<JarEntry> entities = jarFile.entries();
-        while (entities.hasMoreElements()) {
-            JarEntry entry = entities.nextElement();
-            if ((!entry.isDirectory()) && (entry.getName().indexOf('/') == -1)) {
-                if (isSystemNativeFile(entry.getName())) {
-                    natives.add(entry.getName());
+        if (jarFile != null) {
+            Enumeration<JarEntry> entities = jarFile.entries();
+            while (entities.hasMoreElements()) {
+                JarEntry entry = entities.nextElement();
+                if ((!entry.isDirectory()) && (entry.getName().indexOf('/') == -1)) {
+                    if (isSystemNativeFile(entry.getName())) {
+                        natives.add(entry.getName());
+                    }
                 }
             }
+            try {
+                jarFile.close();
+            } catch (IOException e) {
+                logger.error("unable to close jar", e);
+            }
         }
-        jarFile.close();
         return natives;
     }
 
-    public boolean isSystemNativeFile (String entryName) {
+    private boolean isSystemNativeFile (String entryName) {
         String osName = System.getProperty("os.name");
         String fileName   = entryName.toLowerCase();
         return isWindowsNative(osName, fileName)
@@ -116,17 +131,19 @@ public class NativesHandler {
                 (fileName.endsWith(".jnilib")) || (fileName.endsWith(".dylib"))));
     }
 
-
     private void checkCapable () throws Exception {
         if (cacheDir == null) {
             throw new IOException("Cache dir not found");
         }
-        if (systemKey == null) {
+        if (!canDetermineSystem()) {
             throw new Exception("Unable to determine system");
+        }
+        if (jarFile == null) {
+            throw new Exception("Not running from jar");
         }
     }
 
-    private String getSystemKey () {
+    private boolean canDetermineSystem () {
         String osName = System.getProperty("os.name");
         String systemKey = null;
         if (osName.startsWith("Win")) {
@@ -136,15 +153,26 @@ public class NativesHandler {
         } else if ((osName.startsWith("Mac")) || (osName.startsWith("Darwin"))) {
             systemKey = OSX;
         }
-        return systemKey;
+        return systemKey != null;
     }
 
-    public void cleanupNatives () {
-        logger.info("closing natives");
+    private void deleteDir (File dir) {
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (!file.delete()) {
+                    System.out.println("Unable to remove native file: " + file.toString());
+                }
+            }
+        }
+        if (!dir.delete()) {
+            System.out.println("Unable to remove native dir");
+        }
     }
+
 
     private void fixLibraryPath () {
-        System.setProperty( "java.library.path", "natives" );
+        System.setProperty("java.library.path", cacheDir.getAbsolutePath());
         Field fieldSysPath;
         try {
             fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
@@ -171,15 +199,18 @@ public class NativesHandler {
         if ((cacheDirPath == null) || (System.getProperty("os.name").startsWith("Win"))) {
             cacheDirPath = System.getProperty("java.io.tmpdir");
         }
+        cacheDirPath += File.separator + "natives" + new Random().nextInt();
         return cacheDirPath;
     }
 
-    public JarFile getRunningJar() {
+    private JarFile getRunningJar() {
         JarFile j = null;
-        try {
-            j = new JarFile(new File(NativesHandler.class.getProtectionDomain().getCodeSource().getLocation().toURI()), false);
-        } catch (Exception e) {
-            logger.error("can't find running jar", e);
+        if (inJar()) {
+            try {
+                j = new JarFile(new File(NativesHandler.class.getProtectionDomain().getCodeSource().getLocation().toURI()), false);
+            } catch (Exception e) {
+                logger.error("can't find running jar", e);
+            }
         }
         return j;
     }
