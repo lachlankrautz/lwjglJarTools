@@ -13,15 +13,8 @@ public class Main {
     private static Logger logger = LogManager.getLogger(Main.class.getName());
 
     public static void main (String[] args) {
-        logger.info("Entering application");
-        if (NativesHandler.inJar()) {
-            NativesHandler n = new NativesHandler();
-            try {
-                n.cacheNatives();
-            } catch (Exception e) {
-                logger.error("Unable to cache natives", e);
-            }
-        }
+        NativesHandler n = new NativesHandler();
+        n.cacheNatives();
         logger.info("Exiting application");
     }
 
