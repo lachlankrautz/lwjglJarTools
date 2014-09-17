@@ -14,10 +14,8 @@ public class Main {
 
     public static void main (String[] args) {
         NativesHandler n = new NativesHandler();
-        n.cacheNatives();
+        n.handleNatives();
         logger.info("Exiting application");
     }
-
-
 
 }

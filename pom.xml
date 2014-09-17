@@ -59,7 +59,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>co.notime.lwjglnatives.Main</mainClass>
+							<mainClass>${project.groupId}.Main</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

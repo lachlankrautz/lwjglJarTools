@@ -19,28 +19,49 @@ import java.util.jar.JarFile;
  * User: lachlan.krautz
  * Date: 14/09/2014
  * Time: 2:55 PM
+ *
+ * Natives handler will set the library path for native libraries based on
+ * weather or not it's running from a jar or not.
+ * If running from a jar it will also extract the natives and store them in a temp dir.
  */
 public class NativesHandler {
 
     private static Logger logger = LogManager.getLogger(NativesHandler.class.getName());
-    private static final String DEFAULT_CACHE_DIR_NAME = "co.notime.lwjglnatives";
+    private static final String DEFAULT_CACHE_DIR_NAME    = "co.notime.lwjglnatives";
+    private static final String DEFAULT_NATIVES_FILE_PATH = "target" + File.separator + "natives";
     private static final String WINDOWS = "windows";
     private static final String LINUX   = "linux";
     private static final String OSX     = "osx";
 
+    private String       nativesFilePath;
+    private String       cacheDirName;
     private JarFile      jarFile;
     private List<String> natives;
 
     public NativesHandler () {
-        jarFile       = getRunningJar();
-        natives       = findSystemNatives(jarFile);
+        nativesFilePath = DEFAULT_NATIVES_FILE_PATH;
+        cacheDirName    = DEFAULT_CACHE_DIR_NAME;
+        jarFile         = getRunningJar();
+        natives         = findSystemNatives(jarFile);
     }
 
-    public void cacheNatives () {
-        cacheNatives(DEFAULT_CACHE_DIR_NAME);
+    public void handleNatives () {
+        if (canCacheNatives()) {
+            cacheNatives(cacheDirName);
+        } else {
+            fixLibraryPath(new File(nativesFilePath));
+        }
     }
 
-    public void cacheNatives (String cacheDirName) {
+    public void setNativesFilePath (String nativesFilePath) {
+        this.nativesFilePath = nativesFilePath;
+    }
+
+    public void setCacheDirName (String cacheDirName) {
+        this.cacheDirName = cacheDirName;
+    }
+
+    private void cacheNatives (String cacheDirName) {
         if (canCacheNatives()) {
             File cacheDir = getCacheDir(cacheDirName);
             for (String s : natives) {
@@ -141,16 +162,18 @@ public class NativesHandler {
 
 
     private void fixLibraryPath (File cacheDir) {
-        System.setProperty("java.library.path", cacheDir.getAbsolutePath());
-        Field fieldSysPath;
-        try {
-            fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
-            fieldSysPath.setAccessible( true );
-            fieldSysPath.set( null, null );
-        } catch (NoSuchFieldException e) {
-            logger.warn("Sys path not found", e);
-        } catch (IllegalAccessException e) {
-            logger.warn("Illegal access on sys path", e);
+        if (cacheDir.exists() && cacheDir.isDirectory()) {
+            System.setProperty("java.library.path", cacheDir.getAbsolutePath());
+            Field fieldSysPath;
+            try {
+                fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
+                fieldSysPath.setAccessible(true);
+                fieldSysPath.set(null, null);
+            } catch (NoSuchFieldException e) {
+                logger.warn("Sys path not found", e);
+            } catch (IllegalAccessException e) {
+                logger.warn("Illegal access on sys path", e);
+            }
         }
     }
 
