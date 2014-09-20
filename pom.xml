@@ -6,11 +6,18 @@
 
 	<groupId>co.notime</groupId>
 	<artifactId>lwjglnatives</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
+	<distributionManagement>
+		<repository>
+			<id>ftp-repository</id>
+			<url>ftp://maven.notime.co/repository</url>
+		</repository>
+	</distributionManagement>
 
 	<dependencies>
 		<dependency>
@@ -37,9 +44,10 @@
 
 	<build>
 		<extensions>
+			<!-- Enabling the use of FTP -->
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh-external</artifactId>
+				<artifactId>wagon-ftp</artifactId>
 				<version>1.0-beta-6</version>
 			</extension>
 		</extensions>
@@ -78,13 +86,5 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<distributionManagement>
-		<repository>
-			<id>maven.notime.co</id>
-			<name>Notime.co Maven Repository</name>
-			<url>scpexe://maven.notime.co/www</url>
-		</repository>
-	</distributionManagement>
 
 </project>
