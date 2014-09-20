@@ -14,7 +14,7 @@
 
 	<distributionManagement>
 		<repository>
-			<id>ftp-repository</id>
+			<id>maven.notime.co</id>
 			<url>ftp://maven.notime.co/repository</url>
 		</repository>
 	</distributionManagement>
@@ -60,29 +60,6 @@
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.4.1</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>${project.groupId}.Main</mainClass>
-						</manifest>
-					</archive>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id> <!-- this is used for inheritance merges -->
-						<phase>package</phase> <!-- bind to the packaging phase -->
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
