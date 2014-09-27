@@ -1,4 +1,4 @@
-lwjgltools
+lwjglJarTools
 ============
 
 Goal is to make it simple to build single jar lwjgl applications.
