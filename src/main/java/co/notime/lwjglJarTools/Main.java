@@ -1,4 +1,4 @@
-package co.notime.lwjglnatives;
+package co.notime.lwjglJarTools;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

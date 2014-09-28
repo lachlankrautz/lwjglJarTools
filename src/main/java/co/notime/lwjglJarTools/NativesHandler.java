@@ -1,4 +1,4 @@
-package co.notime.lwjglnatives;
+package co.notime.lwjglJarTools;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,7 +27,7 @@ import java.util.jar.JarFile;
 public class NativesHandler {
 
     private static Logger logger = LogManager.getLogger(NativesHandler.class.getName());
-    private static final String DEFAULT_CACHE_DIR_NAME    = "co.notime.lwjglnatives";
+    private static final String DEFAULT_CACHE_DIR_NAME    = "co.notime.lwjglJarTools.lwjglnatives";
     private static final String DEFAULT_NATIVES_FILE_PATH = "target" + File.separator + "natives";
     private static final String WINDOWS = "windows";
     private static final String LINUX   = "linux";

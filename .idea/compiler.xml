@@ -22,13 +22,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="lwjgl-natives" />
-        <module name="lwjglnatives" />
-        <module name="natives" />
+        <module name="lwjglJarTools" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.6">
-      <module name="lwjglnatives" target="1.6" />
+      <module name="lwjglJarTools" target="1.6" />
     </bytecodeTargetLevel>
   </component>
 </project>

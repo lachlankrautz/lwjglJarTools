@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/lwjglnatives.iml" filepath="$PROJECT_DIR$/lwjglnatives.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lwjglJarTools.iml" filepath="$PROJECT_DIR$/lwjglJarTools.iml" />
     </modules>
   </component>
 </project>

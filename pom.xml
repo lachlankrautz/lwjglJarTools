@@ -5,11 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>co.notime</groupId>
-	<artifactId>lwjglnatives</artifactId>
+	<artifactId>lwjglJarTools</artifactId>
 	<version>1.0</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<junit.version>4.10</junit.version>
+		<slick.version>274</slick.version>
 	</properties>
 
 	<distributionManagement>
@@ -20,6 +22,17 @@
 	</distributionManagement>
 
 	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.cokeandcode.slick</groupId>
+			<artifactId>slick-util</artifactId>
+			<version>${slick.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
